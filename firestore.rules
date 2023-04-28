@@ -3,7 +3,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
     	// Allow everything for admins
-      allow read, write: if request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid)/protected/roles) && get(/databases/$(database)/documents/users/$(request.auth.uid)/protected/roles).data.admin == true;
+      allow read, write: if request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid)/protected/readOnly) && get(/databases/$(database)/documents/users/$(request.auth.uid)/protected/readOnly).data.role == "admin";
     }
 
     match /users/{userId} {
@@ -13,7 +13,6 @@ service cloud.firestore {
       // Users can freely read these fields but only admins can write
       match /protected/admin {
       	allow read: if request.auth != null && request.auth.uid == userId
-        allow write: if false
       }
     }
   }
