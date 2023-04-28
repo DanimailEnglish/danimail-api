@@ -5,7 +5,7 @@ import * as functions from "firebase-functions";
 import { firebaseAdmin } from "../lib/firebaseAdmin";
 import { validateUpdateUser } from "../lib/schemas/users";
 
-export const updateUser = functions.https.onCall((data, { auth }) => {
+export const updateCurrentUser = functions.https.onCall((data, { auth }) => {
   if (auth == null) {
     throw new functions.https.HttpsError(
       "permission-denied",
