@@ -1,17 +1,18 @@
 import type { Timestamp } from "firebase-admin/firestore";
 
-export enum UserRole {
-  Student = "STUDENT",
-  Admin = "ADMIN",
-}
-
-export interface FirestoreUserData {
-  firstName: string;
-  lastName: string;
-}
-
-export interface FirestoreUserProtectedReadOnlyData {
+export interface FirestoreUserReadOnlyFields {
   createdAt: Timestamp;
-  role: UserRole;
+  updatedAt: Timestamp;
+  email?: string;
+  role: "STUDENT" | "ADMIN";
   unusedVideos: number;
 }
+
+export interface FirestoreUserWritableFields {
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface FirestoreUser
+  extends FirestoreUserReadOnlyFields,
+    FirestoreUserWritableFields {}

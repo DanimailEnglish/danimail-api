@@ -4,18 +4,13 @@ service cloud.firestore {
     match /{document=**} {
     	// Allow everything for admins
       allow read, write: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)/protected/readOnly) && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)/protected/readOnly).data.role == "ADMIN";
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "ADMIN";
     }
 
     match /users/{userId} {
-	    // Top level fields can be read and written by self (name, phone number, etc)
+	    // User data can be read from the app by self
       allow read, write: if request.auth != null && request.auth.uid == userId
-      
-      // These fields can only be read by self (created at, user role, etc)
-      match /protected/readOnly {
-      	allow read: if request.auth != null && request.auth.uid == userId
-      }
     }
   }
 }
