@@ -1,13 +1,13 @@
-import { DefinedError } from "ajv";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 
-import { validateUpdateUser } from "../../lib/schemas/users";
+import { userUpdatableSchema, UserUpdateObject } from "../../lib/schemas/users";
 import type { HttpsOnCallHandler } from "../../types";
 
 admin.initializeApp();
 
-const updateCurrentUserHandler: HttpsOnCallHandler = (data, { auth }) => {
+const updateCurrentUserHandler: HttpsOnCallHandler = async (data, { auth }) => {
+  // Validate user
   if (auth == null) {
     throw new functions.https.HttpsError(
       "permission-denied",
@@ -15,22 +15,32 @@ const updateCurrentUserHandler: HttpsOnCallHandler = (data, { auth }) => {
     );
   }
 
-  const isValidData = validateUpdateUser(data);
-  if (!isValidData) {
-    const error = validateUpdateUser.errors?.[0] as DefinedError;
+  // Validate data
+  const validation = userUpdatableSchema.safeParse(data);
+  if (!validation.success) {
     throw new functions.https.HttpsError(
       "invalid-argument",
-      error.message ?? `Invalid argument: ${error.propertyName}`
+      validation.error.message
     );
   }
 
-  admin
-    .firestore()
-    .doc(`users/${auth.uid}`)
-    .update({
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      ...data,
-    });
+  // Convert nulls to deletes
+  const updateUserData: UserUpdateObject = {
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  };
+  let key: keyof typeof validation.data;
+  for (key in validation.data) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      const value = data[key];
+      if (value === null) {
+        updateUserData[key] = admin.firestore.FieldValue.delete();
+      } else {
+        updateUserData[key] = value;
+      }
+    }
+  }
+
+  await admin.firestore().doc(`users/${auth.uid}`).update(updateUserData);
 };
 
 export default updateCurrentUserHandler;

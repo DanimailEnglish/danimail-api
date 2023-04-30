@@ -1,13 +1,14 @@
 import * as admin from "firebase-admin";
 
-import type { AuthOnCreateHandler, UserCreate } from "../../types";
+import type { UserCreateObject } from "../../lib/schemas/users";
+import type { AuthOnCreateHandler } from "../../types";
 
 admin.initializeApp();
 
 const createUserOnAuthHandler: AuthOnCreateHandler = async (
   user: admin.auth.UserRecord
 ) => {
-  const userCreateData: UserCreate = {
+  const userCreateData: UserCreateObject = {
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     email: user.email,
