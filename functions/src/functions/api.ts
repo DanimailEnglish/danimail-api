@@ -1,5 +1,4 @@
 import { DefinedError } from "ajv";
-import { Timestamp } from "firebase-admin/firestore";
 import * as functions from "firebase-functions";
 
 import { firebaseAdmin } from "../lib/firebaseAdmin";
@@ -22,12 +21,11 @@ export const updateCurrentUser = functions.https.onCall((data, { auth }) => {
     );
   }
 
-  const now = Timestamp.fromDate(new Date());
   firebaseAdmin
     .firestore()
     .doc(`users/${auth.uid}`)
     .update({
-      updatedAt: now,
+      updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
       ...data,
     });
 });
