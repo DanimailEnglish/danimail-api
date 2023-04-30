@@ -1,12 +1,7 @@
-import type * as admin from "firebase-admin/auth";
 import type * as functions from "firebase-functions";
 
-export type AuthOnCreateHandler = (
-  user: admin.UserRecord,
-  context: functions.EventContext
-) => PromiseLike<unknown> | unknown;
+export type AuthOnCreateHandler = Parameters<
+  functions.auth.UserBuilder["onCreate"]
+>[0];
 
-export type HttpsOnCallHandler = (
-  data: unknown,
-  context: functions.https.CallableContext
-) => unknown;
+export type HttpsOnCallHandler = Parameters<typeof functions.https.onCall>[0];
