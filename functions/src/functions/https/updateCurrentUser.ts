@@ -1,10 +1,13 @@
 import { DefinedError } from "ajv";
+import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 
-import { firebaseAdmin } from "../lib/firebaseAdmin";
-import { validateUpdateUser } from "../lib/schemas/users";
+import { validateUpdateUser } from "../../lib/schemas/users";
+import type { HttpsOnCallHandler } from "../../types";
 
-export const updateCurrentUser = functions.https.onCall((data, { auth }) => {
+admin.initializeApp();
+
+const updateCurrentUserHandler: HttpsOnCallHandler = (data, { auth }) => {
   if (auth == null) {
     throw new functions.https.HttpsError(
       "permission-denied",
@@ -21,11 +24,13 @@ export const updateCurrentUser = functions.https.onCall((data, { auth }) => {
     );
   }
 
-  firebaseAdmin
+  admin
     .firestore()
     .doc(`users/${auth.uid}`)
     .update({
-      updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       ...data,
     });
-});
+};
+
+export default updateCurrentUserHandler;
