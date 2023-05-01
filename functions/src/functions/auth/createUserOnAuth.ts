@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 
-import type { UserCreateObject } from "../../lib/schemas/users";
+import type { UserCreateObject } from "../../lib/schemas/user";
 import type { AuthOnCreateHandler } from "../../types";
 
 admin.initializeApp();

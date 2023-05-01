@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 
-import { userUpdatableSchema, UserUpdateObject } from "../../lib/schemas/users";
+import { userUpdatableSchema, UserUpdateObject } from "../../lib/schemas/user";
 import type { HttpsOnCallHandler } from "../../types";
 
 admin.initializeApp();
