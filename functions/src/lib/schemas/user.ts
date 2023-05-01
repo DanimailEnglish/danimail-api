@@ -21,9 +21,5 @@ export const userSchema = z
 export type UserUpdateJSON = z.infer<typeof userUpdatableSchema>;
 export type UserJSON = z.infer<typeof userSchema>;
 
-export type UserCreateObject = Writable<
-  ConvertTimestamps<UserJSON, "createdAt" | "updatedAt">
->;
-export type UserUpdateObject = Writable<
-  Partial<ConvertTimestamps<UserJSON, "createdAt" | "updatedAt">>
->;
+export type UserCreateObject = Writable<ConvertTimestamps<UserJSON>>;
+export type UserUpdateObject = Writable<Partial<ConvertTimestamps<UserJSON>>>;

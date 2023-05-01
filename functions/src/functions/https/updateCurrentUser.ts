@@ -28,12 +28,20 @@ const updateCurrentUserHandler: HttpsOnCallHandler = async (data, { auth }) => {
   const updateUserData: UserUpdateObject = {
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   };
+
+  // Weird finagling because of Typescript
   let key: keyof typeof validation.data;
   for (key in validation.data) {
-    if (Object.prototype.hasOwnProperty.call(data, key)) {
-      const value = data[key];
+    if (Object.prototype.hasOwnProperty.call(validation.data, key)) {
+      const value = validation.data[key];
       if (value === null) {
-        updateUserData[key] = admin.firestore.FieldValue.delete();
+        // TODO: Find a better way to detect nullable fields that works
+        // with Typescript
+        if (key === "nickname" || key === "phoneNumber") {
+          updateUserData[key] = admin.firestore.FieldValue.delete();
+        } else {
+          delete updateUserData[key];
+        }
       } else {
         updateUserData[key] = value;
       }
