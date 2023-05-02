@@ -1,6 +1,7 @@
 import Mux from "@mux/mux-node";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
+import { defineString } from "firebase-functions/params";
 
 import { userConverter } from "../../lib/schemas/user";
 import {
@@ -9,15 +10,10 @@ import {
 } from "../../lib/schemas/videoUpload";
 import type { HttpsOnCallHandler } from "../../types";
 
-if (process.env.MUX_TOKEN_ID == null || process.env.MUX_TOKEN_SECRET == null) {
-  throw new Error(
-    "MUX_TOKEN_ID and MUX_TOKEN_SECRET environment variables are required"
-  );
-}
-const { Video } = new Mux(
-  process.env.MUX_TOKEN_ID,
-  process.env.MUX_TOKEN_SECRET
-);
+const muxTokenId = defineString("MUX_TOKEN_ID");
+const muxTokenSecret = defineString("MUX_TOKEN_SECRET");
+
+const { Video } = new Mux(muxTokenId.value(), muxTokenSecret.value());
 
 admin.initializeApp();
 

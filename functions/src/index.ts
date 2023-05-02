@@ -9,6 +9,11 @@ export const updateCurrentUser = functions.https.onCall(
   }
 );
 
+export const createUpload = functions.https.onCall(async (data, context) => {
+  const { default: handler } = await import("./functions/https/createUpload");
+  handler(data, context);
+});
+
 export const createUserOnAuth = functions.auth
   .user()
   .onCreate(async (user, context) => {
