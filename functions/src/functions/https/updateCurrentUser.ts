@@ -1,10 +1,18 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 
-import { userUpdatableSchema, UserUpdateObject } from "../../lib/schemas/user";
+import { userConverter, userSchema } from "../../lib/schemas/user";
 import type { HttpsOnCallHandler } from "../../types";
 
 admin.initializeApp();
+
+export const updateCurrentUserSchema = userSchema.pick({
+  email: true,
+  phoneNumber: true,
+  firstName: true,
+  lastName: true,
+  nickname: true,
+});
 
 const updateCurrentUserHandler: HttpsOnCallHandler = async (data, { auth }) => {
   // Validate user
@@ -16,7 +24,7 @@ const updateCurrentUserHandler: HttpsOnCallHandler = async (data, { auth }) => {
   }
 
   // Validate data
-  const validation = userUpdatableSchema.safeParse(data);
+  const validation = updateCurrentUserSchema.safeParse(data);
   if (!validation.success) {
     throw new functions.https.HttpsError(
       "invalid-argument",
@@ -24,31 +32,12 @@ const updateCurrentUserHandler: HttpsOnCallHandler = async (data, { auth }) => {
     );
   }
 
-  // Convert nulls to deletes
-  const updateUserData: UserUpdateObject = {
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-  };
-
-  // Weird finagling because of Typescript
-  let key: keyof typeof validation.data;
-  for (key in validation.data) {
-    if (Object.prototype.hasOwnProperty.call(validation.data, key)) {
-      const value = validation.data[key];
-      if (value === null) {
-        // TODO: Find a better way to detect nullable fields that works
-        // with Typescript
-        if (key === "nickname" || key === "phoneNumber") {
-          updateUserData[key] = admin.firestore.FieldValue.delete();
-        } else {
-          delete updateUserData[key];
-        }
-      } else {
-        updateUserData[key] = value;
-      }
-    }
-  }
-
-  await admin.firestore().doc(`users/${auth.uid}`).update(updateUserData);
+  await admin
+    .firestore()
+    .collection("users")
+    .withConverter(userConverter)
+    .doc(auth.uid)
+    .update(validation.data);
 };
 
 export default updateCurrentUserHandler;

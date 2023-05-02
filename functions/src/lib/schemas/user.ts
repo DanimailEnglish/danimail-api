@@ -1,25 +1,44 @@
+import type { FirestoreDataConverter } from "firebase-admin/firestore";
 import { z } from "zod";
 
-import { ConvertTimestamps, timestampsSchema, Writable } from "./shared";
-
-export const userUpdatableSchema = z.object({
-  email: z.string().email().optional(),
-  phoneNumber: z.string().nullable().optional(),
-  firstName: z.string().min(4).max(100).optional(),
-  lastName: z.string().min(4).max(100).optional(),
-  nickname: z.string().min(4).max(100).nullable().optional(),
-});
+import {
+  ConvertTimestamps,
+  dateStringToTimestamp,
+  nullToFieldValueDelete,
+  timestampsSchema,
+} from "./shared";
 
 export const userSchema = z
   .object({
+    email: z.string().email().optional(),
+    phoneNumber: z.string().nullable().optional(),
+    firstName: z.string().min(4).max(100).optional(),
+    lastName: z.string().min(4).max(100).optional(),
+    nickname: z.string().min(4).max(100).nullable().optional(),
     role: z.enum(["STUDENT", "ADMIN"]),
     unusedVideos: z.number(),
   })
-  .merge(userUpdatableSchema)
   .merge(timestampsSchema);
 
-export type UserUpdateJSON = z.infer<typeof userUpdatableSchema>;
-export type UserJSON = z.infer<typeof userSchema>;
+export type User = z.infer<typeof userSchema>;
+export type FirebaseUser = ConvertTimestamps<User>;
 
-export type UserCreateObject = Writable<ConvertTimestamps<UserJSON>>;
-export type UserUpdateObject = Writable<Partial<ConvertTimestamps<UserJSON>>>;
+export const userConverter: FirestoreDataConverter<User> = {
+  toFirestore: ({ createdAt, updatedAt, nickname, phoneNumber, ...rest }) => {
+    return {
+      createdAt: dateStringToTimestamp(createdAt),
+      updatedAt: dateStringToTimestamp(updatedAt),
+      nickname: nullToFieldValueDelete(nickname),
+      phoneNumber: nullToFieldValueDelete(phoneNumber),
+      ...rest,
+    };
+  },
+  fromFirestore: (userDoc): User => {
+    const user = userDoc.data() as FirebaseUser;
+    return {
+      ...user,
+      createdAt: user.createdAt.toDate().toISOString(),
+      updatedAt: user.updatedAt.toDate().toISOString(),
+    };
+  },
+};
