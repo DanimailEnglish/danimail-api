@@ -1,17 +1,14 @@
 import Mux from "@mux/mux-node";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import { defineString } from "firebase-functions/params";
 
+import { muxTokenId, muxTokenSecret } from "../../config";
 import { userConverter } from "../../lib/schemas/user";
 import {
   videoUploadConverter,
   videoUploadSchema,
 } from "../../lib/schemas/videoUpload";
 import type { HttpsOnCallHandler } from "../../types";
-
-const muxTokenId = defineString("MUX_TOKEN_ID");
-const muxTokenSecret = defineString("MUX_TOKEN_SECRET");
 
 const { Video } = new Mux(muxTokenId.value(), muxTokenSecret.value());
 

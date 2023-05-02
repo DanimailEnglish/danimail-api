@@ -1,3 +1,5 @@
+import "./config";
+
 import * as functions from "firebase-functions";
 
 export const updateCurrentUser = functions.https.onCall(
