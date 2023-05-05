@@ -1,18 +1,20 @@
 import Mux from "@mux/mux-node";
-import * as functions from "firebase-functions";
 
-import { muxWebhookSecret } from "../../config";
-import { FirestoreVideo } from "../../lib/firestore/video";
-import type { HttpsOnRequestHandler, MuxWebhookEvent } from "../../types";
+import { muxWebhookSecret } from "../../../config";
+import { FirestoreVideo } from "../../../lib/firestore/video";
+import type { HttpsOnRequestHandler, MuxWebhookEvent } from "../../../types";
 
 const muxWebhookHandler: HttpsOnRequestHandler = async (request, response) => {
+  if (request.method !== "POST") {
+    response.sendStatus(404);
+    return;
+  }
+
   // Validate existence mux signature header
   const muxSignature = request.header("mux-signature");
   if (muxSignature == null) {
-    throw new functions.https.HttpsError(
-      "failed-precondition",
-      "mux-signature header is required"
-    );
+    response.sendStatus(403);
+    return;
   }
 
   // Validate mux signature
@@ -23,10 +25,8 @@ const muxWebhookHandler: HttpsOnRequestHandler = async (request, response) => {
       muxWebhookSecret.value()
     )
   ) {
-    throw new functions.https.HttpsError(
-      "failed-precondition",
-      "Mux signature verification failed"
-    );
+    response.sendStatus(403);
+    return;
   }
 
   const event = request.body as MuxWebhookEvent;

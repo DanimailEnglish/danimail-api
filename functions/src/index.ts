@@ -7,21 +7,25 @@ import * as functions from "firebase-functions";
 
 export const updateCurrentUser = functions.https.onCall(async (...args) => {
   const { default: handler } = await import(
-    "./functions/https/updateCurrentUser"
+    "./functions/https/onCall/updateCurrentUser"
   );
   handler(...args);
 });
 
 export const createVideo = functions.https.onCall(async (...args) => {
-  const { default: handler } = await import("./functions/https/createVideo");
+  const { default: handler } = await import(
+    "./functions/https/onCall/createVideo"
+  );
   handler(...args);
 });
 
 // Http endpoints
-// These functions can be called by any http request
+// These functions are called through direct http request
 
 export const muxWebhook = functions.https.onRequest(async (...args) => {
-  const { default: handler } = await import("./functions/https/muxWebhook");
+  const { default: handler } = await import(
+    "./functions/https/onRequest/muxWebhook"
+  );
   handler(...args);
 });
 

@@ -1,8 +1,8 @@
 import * as functions from "firebase-functions";
 
-import { FirestoreUser } from "../../lib/firestore/user";
-import { userSchema } from "../../lib/schemas/user";
-import type { HttpsOnCallHandler } from "../../types";
+import { FirestoreUser } from "../../../lib/firestore/user";
+import { userSchema } from "../../../lib/schemas/user";
+import type { HttpsOnCallHandler } from "../../../types";
 
 export const updateCurrentUserSchema = userSchema.pick({
   // TODO: Update auth email too.

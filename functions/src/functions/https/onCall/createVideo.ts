@@ -2,11 +2,11 @@ import Mux from "@mux/mux-node";
 import * as functions from "firebase-functions";
 import { v4 as uuidV4 } from "uuid";
 
-import { muxTokenId, muxTokenSecret } from "../../config";
-import { FirestoreUser } from "../../lib/firestore/user";
-import { FirestoreVideo } from "../../lib/firestore/video";
-import { videoSchema } from "../../lib/schemas/video";
-import type { HttpsOnCallHandler } from "../../types";
+import { muxTokenId, muxTokenSecret } from "../../../config";
+import { FirestoreUser } from "../../../lib/firestore/user";
+import { FirestoreVideo } from "../../../lib/firestore/video";
+import { videoSchema } from "../../../lib/schemas/video";
+import type { HttpsOnCallHandler } from "../../../types";
 
 const { Video } = new Mux(muxTokenId.value(), muxTokenSecret.value());
 
