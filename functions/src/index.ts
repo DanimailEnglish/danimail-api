@@ -11,8 +11,8 @@ export const updateCurrentUser = functions.https.onCall(
   }
 );
 
-export const createUpload = functions.https.onCall(async (data, context) => {
-  const { default: handler } = await import("./functions/https/createUpload");
+export const createVideo = functions.https.onCall(async (data, context) => {
+  const { default: handler } = await import("./functions/https/createVideo");
   handler(data, context);
 });
 

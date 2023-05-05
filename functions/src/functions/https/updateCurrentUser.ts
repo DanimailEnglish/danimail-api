@@ -1,13 +1,12 @@
-import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 
-import { userConverter, userSchema } from "../../lib/schemas/user";
+import { FirestoreUser } from "../../lib/firestore/user";
+import { userSchema } from "../../lib/schemas/user";
 import type { HttpsOnCallHandler } from "../../types";
 
-admin.initializeApp();
-
 export const updateCurrentUserSchema = userSchema.pick({
-  email: true,
+  // TODO: Update auth email too.
+  // email: true,
   phoneNumber: true,
   firstName: true,
   lastName: true,
@@ -32,12 +31,7 @@ const updateCurrentUserHandler: HttpsOnCallHandler = async (data, { auth }) => {
     );
   }
 
-  await admin
-    .firestore()
-    .collection("users")
-    .withConverter(userConverter)
-    .doc(auth.uid)
-    .update(validation.data);
+  await FirestoreUser.update(auth.uid, validation.data);
 };
 
 export default updateCurrentUserHandler;

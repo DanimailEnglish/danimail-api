@@ -5,3 +5,7 @@ export type AuthOnCreateHandler = Parameters<
 >[0];
 
 export type HttpsOnCallHandler = Parameters<typeof functions.https.onCall>[0];
+
+export type HttpsOnRequestHandler = Parameters<
+  typeof functions.https.onRequest
+>[0];
