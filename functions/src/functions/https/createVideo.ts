@@ -70,6 +70,10 @@ const createVideoHandler: HttpsOnCallHandler = async (data, { auth }) => {
     muxUploadId: muxUpload.id,
     status: "UPLOADING",
   });
+
+  return {
+    uploadUrl: muxUpload.url,
+  };
 };
 
 export default createVideoHandler;

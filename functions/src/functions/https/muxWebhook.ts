@@ -37,7 +37,10 @@ const muxWebhookHandler: HttpsOnRequestHandler = async (request, response) => {
       if (videoId != null) {
         const video = await FirestoreVideo.get(videoId);
         if (video?.data()?.status === "UPLOADING") {
-          FirestoreVideo.update(videoId, { status: "PROCESSING" });
+          FirestoreVideo.update(videoId, {
+            status: "PROCESSING",
+            muxAssetId: event.data.id,
+          });
         }
       }
       break;
@@ -48,6 +51,7 @@ const muxWebhookHandler: HttpsOnRequestHandler = async (request, response) => {
       if (videoId != null) {
         FirestoreVideo.update(videoId, {
           status: "PROCESSING_ERROR",
+          muxAssetId: event.data.id,
           error: event.data.errors?.messages.join(" | "),
         });
       }
@@ -57,7 +61,15 @@ const muxWebhookHandler: HttpsOnRequestHandler = async (request, response) => {
     case "video.asset.ready": {
       const videoId = event.data.passthrough;
       if (videoId != null) {
-        FirestoreVideo.update(videoId, { status: "READY" });
+        const playbackId = event.data.playback_ids?.[0]?.id;
+        const playbackUrl =
+          playbackId && `https://stream.mux.com/${playbackId}.m3u8`;
+
+        FirestoreVideo.update(videoId, {
+          status: "READY",
+          muxAssetId: event.data.id,
+          playbackUrl,
+        });
       }
       break;
     }
