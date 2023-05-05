@@ -1,6 +1,6 @@
 import "../initializeApp";
 
-import { firestore } from "firebase-admin";
+import * as admin from "firebase-admin";
 import type {
   DocumentSnapshot,
   FirestoreDataConverter,
@@ -33,7 +33,7 @@ export const videoConverter: FirestoreDataConverter<VideoType> = {
  * @return {firestore.CollectionReference}
  */
 function collection() {
-  return firestore().collection("videos").withConverter(videoConverter);
+  return admin.firestore().collection("videos").withConverter(videoConverter);
 }
 
 /**
@@ -62,13 +62,15 @@ async function get(videoId: string): Promise<DocumentSnapshot<VideoType>> {
  */
 async function create(
   videoId: string,
-  data: firestore.WithFieldValue<Omit<VideoType, "createdAt" | "updatedAt">>
+  data: admin.firestore.WithFieldValue<
+    Omit<VideoType, "createdAt" | "updatedAt">
+  >
 ) {
   return collection()
     .doc(videoId)
     .create({
-      createdAt: firestore.FieldValue.serverTimestamp(),
-      updatedAt: firestore.FieldValue.serverTimestamp(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       ...data,
     });
 }
@@ -81,12 +83,12 @@ async function create(
  */
 async function update(
   videoId: string,
-  data: firestore.WithFieldValue<Partial<VideoType>>
+  data: admin.firestore.WithFieldValue<Partial<VideoType>>
 ) {
   return collection()
     .doc(videoId)
     .update({
-      updatedAt: firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       ...data,
     });
 }

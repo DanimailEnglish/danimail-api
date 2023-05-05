@@ -1,6 +1,6 @@
 import "../initializeApp";
 
-import { firestore } from "firebase-admin";
+import * as admin from "firebase-admin";
 import type {
   DocumentSnapshot,
   FirestoreDataConverter,
@@ -34,7 +34,7 @@ export const userConverter: FirestoreDataConverter<UserType> = {
  * @return {firestore.CollectionReference}
  */
 function collection() {
-  return firestore().collection("users").withConverter(userConverter);
+  return admin.firestore().collection("users").withConverter(userConverter);
 }
 
 /**
@@ -63,13 +63,15 @@ async function get(userId: string): Promise<DocumentSnapshot<UserType>> {
  */
 async function create(
   userId: string,
-  data: firestore.WithFieldValue<Omit<UserType, "createdAt" | "updatedAt">>
+  data: admin.firestore.WithFieldValue<
+    Omit<UserType, "createdAt" | "updatedAt">
+  >
 ) {
   return collection()
     .doc(userId)
     .create({
-      createdAt: firestore.FieldValue.serverTimestamp(),
-      updatedAt: firestore.FieldValue.serverTimestamp(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       ...data,
     });
 }
@@ -82,12 +84,12 @@ async function create(
  */
 async function update(
   userId: string,
-  data: firestore.WithFieldValue<Partial<UserType>>
+  data: admin.firestore.WithFieldValue<Partial<UserType>>
 ) {
   return collection()
     .doc(userId)
     .update({
-      updatedAt: firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       ...data,
     });
 }

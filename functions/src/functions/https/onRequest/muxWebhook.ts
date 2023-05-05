@@ -18,13 +18,13 @@ const muxWebhookHandler: HttpsOnRequestHandler = async (request, response) => {
   }
 
   // Validate mux signature
-  if (
-    !Mux.Webhooks.verifyHeader(
+  try {
+    Mux.Webhooks.verifyHeader(
       request.rawBody,
       muxSignature,
       muxWebhookSecret.value()
-    )
-  ) {
+    );
+  } catch {
     response.sendStatus(403);
     return;
   }

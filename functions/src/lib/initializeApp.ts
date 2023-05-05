@@ -1,3 +1,3 @@
-import { initializeApp } from "firebase-admin";
+import * as admin from "firebase-admin";
 
-initializeApp();
+admin.initializeApp();
