@@ -10,10 +10,13 @@ import type { HttpsOnCallHandler } from "../../../types";
 
 const { Video } = new Mux(muxTokenId.value(), muxTokenSecret.value());
 
-export const createUploadParamsSchema = videoSchema.pick({
-  recipientId: true,
-  replyToVideoId: true,
-});
+export const createUploadParamsSchema = videoSchema
+  .pick({
+    recipientId: true,
+    replyToVideoId: true,
+  })
+  .partial()
+  .optional();
 
 const createVideoHandler: HttpsOnCallHandler = async (data, { auth }) => {
   // Validate user
@@ -39,7 +42,13 @@ const createVideoHandler: HttpsOnCallHandler = async (data, { auth }) => {
   let recipientId: string;
   if (user.data()?.role === "ADMIN") {
     // If user is an admin, allow them to send videos to any user
-    recipientId = validation.data.recipientId;
+    if (validation.data?.recipientId == null) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "recipientId is required as admin"
+      );
+    }
+    recipientId = validation.data?.recipientId;
   } else {
     // Otherwise, force them to send to the teacher.
     const teacher = await FirestoreUser.getTeacher();
@@ -66,12 +75,13 @@ const createVideoHandler: HttpsOnCallHandler = async (data, { auth }) => {
   await FirestoreVideo.create(videoId, {
     senderId: auth.uid,
     recipientId,
-    replyToVideoId: validation.data.replyToVideoId,
+    replyToVideoId: validation.data?.replyToVideoId,
     muxUploadId: muxUpload.id,
     status: "UPLOADING",
   });
 
   return {
+    videoId,
     uploadUrl: muxUpload.url,
   };
 };

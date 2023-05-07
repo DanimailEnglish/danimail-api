@@ -6,7 +6,7 @@ export const videoSchema = z
   .object({
     senderId: z.string(),
     recipientId: z.string(),
-    replyToVideoId: z.string(),
+    replyToVideoId: z.string().optional(),
     muxUploadId: z.string(),
     muxAssetId: z.string().optional(),
     playbackUrl: z.string().optional(),
