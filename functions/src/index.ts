@@ -9,14 +9,14 @@ export const updateCurrentUser = functions.https.onCall(async (...args) => {
   const { default: handler } = await import(
     "./functions/https/onCall/updateCurrentUser"
   );
-  handler(...args);
+  return handler(...args);
 });
 
 export const createVideo = functions.https.onCall(async (...args) => {
   const { default: handler } = await import(
     "./functions/https/onCall/createVideo"
   );
-  handler(...args);
+  return handler(...args);
 });
 
 // Http endpoints
@@ -26,7 +26,7 @@ export const muxWebhook = functions.https.onRequest(async (...args) => {
   const { default: handler } = await import(
     "./functions/https/onRequest/muxWebhook"
   );
-  handler(...args);
+  return handler(...args);
 });
 
 // Events
@@ -38,5 +38,5 @@ export const createUserOnAuth = functions.auth
     const { default: handler } = await import(
       "./functions/auth/createUserOnAuth"
     );
-    handler(...args);
+    return handler(...args);
   });
