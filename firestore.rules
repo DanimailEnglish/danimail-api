@@ -10,7 +10,16 @@ service cloud.firestore {
 
     match /users/{userId} {
 	    // User data can be read from the app by self
-      allow read, write: if request.auth != null && request.auth.uid == userId
+      allow read: if request.auth != null && request.auth.uid == userId
+    }
+
+    match /videos/{videoId} {
+      // Videos can be viewed by the sender and recipient
+      allow read: if request.auth != null &&
+        (
+          request.auth.uid == resource.data.senderId ||
+          request.auth.uid == resource.data.recipientId
+        )
     }
   }
 }
