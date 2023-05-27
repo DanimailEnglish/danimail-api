@@ -49,7 +49,7 @@ const muxWebhookHandler: HttpsOnRequestHandler = async (request, response) => {
 
   const eventHandler = EVENT_HANDLER_MAP[event.type];
   if (eventHandler != null) {
-    eventHandler(event);
+    await eventHandler(event);
   }
 
   response.sendStatus(200);

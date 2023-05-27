@@ -1,3 +1,7 @@
+import "../initializeApp";
+
+import * as admin from "firebase-admin";
+
 import { FirestoreVideo } from "../../../../lib/firestore/video";
 import type { MuxWebhookEvent } from "../../../../types";
 
@@ -12,13 +16,17 @@ export async function handleAssetCreatedEvent(event: MuxWebhookEvent) {
 
   const videoId = event.data.passthrough;
   if (videoId != null) {
-    const video = await FirestoreVideo.get(videoId);
-    if (video?.data()?.status === "UPLOADING") {
-      FirestoreVideo.update(videoId, {
-        status: "PROCESSING",
-        muxAssetId: event.data.id,
-      });
-    }
+    await admin.firestore().runTransaction(async (transaction) => {
+      const videoDoc = FirestoreVideo.document(videoId);
+      const video = await transaction.get(videoDoc);
+      if (video?.data()?.status === "UPLOADING") {
+        transaction.update(videoDoc, {
+          status: "PROCESSING",
+          muxAssetId: event.data.id,
+        });
+        await FirestoreVideo.update(videoId, {});
+      }
+    });
   }
 }
 
@@ -33,7 +41,7 @@ export async function handleAssetErroredEvent(event: MuxWebhookEvent) {
 
   const videoId = event.data.passthrough;
   if (videoId != null) {
-    FirestoreVideo.update(videoId, {
+    await FirestoreVideo.update(videoId, {
       status: "PROCESSING_ERROR",
       muxAssetId: event.data.id,
       error: event.data.errors?.messages.join(" | "),
@@ -56,7 +64,7 @@ export async function handleAssetReadyEvent(event: MuxWebhookEvent) {
     const playbackUrl =
       playbackId && `https://stream.mux.com/${playbackId}.m3u8`;
 
-    FirestoreVideo.update(videoId, {
+    await FirestoreVideo.update(videoId, {
       status: "READY",
       muxAssetId: event.data.id,
       playbackUrl,
@@ -75,7 +83,7 @@ export async function handleUploadErroredEvent(event: MuxWebhookEvent) {
 
   const videoId = event.data.new_asset_settings.passthrough;
   if (videoId != null) {
-    FirestoreVideo.update(videoId, {
+    await FirestoreVideo.update(videoId, {
       status: "UPLOADING_ERROR",
       error: event.data.error?.message,
     });
