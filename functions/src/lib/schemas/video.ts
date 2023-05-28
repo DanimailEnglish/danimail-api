@@ -10,6 +10,7 @@ export const videoSchema = z
     muxUploadId: z.string(),
     muxAssetId: z.string().optional(),
     playbackUrl: z.string().optional(),
+    thumbnailUrl: z.string().optional(),
     status: z.enum([
       "UPLOADING",
       "UPLOADING_ERROR",
