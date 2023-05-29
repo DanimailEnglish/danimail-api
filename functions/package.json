@@ -18,7 +18,7 @@
     "@google-cloud/functions-framework": "^3.2.0",
     "@mux/mux-node": "^7.3.0",
     "firebase-admin": "^11.5.0",
-    "firebase-functions": "^4.2.0",
+    "firebase-functions": "latest",
     "uuid": "^9.0.0",
     "zod": "^3.21.4"
   },
