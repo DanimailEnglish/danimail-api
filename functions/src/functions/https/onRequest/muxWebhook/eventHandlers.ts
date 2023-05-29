@@ -1,7 +1,4 @@
-import "../initializeApp";
-
-import * as admin from "firebase-admin";
-
+import { admin } from "../../../../initializeFirebase";
 import { FirestoreVideo } from "../../../../lib/firestore/video";
 import type { MuxWebhookEvent } from "../../../../types";
 

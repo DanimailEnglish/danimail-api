@@ -1,12 +1,10 @@
-import "../initializeApp";
-
-import * as admin from "firebase-admin";
 import type {
   DocumentSnapshot,
   FirestoreDataConverter,
   QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
 
+import { admin } from "../../initializeFirebase";
 import type { FirestoreUserType, UserType } from "../schemas/user";
 import { dateStringToTimestamp } from "./shared";
 

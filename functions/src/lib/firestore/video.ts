@@ -1,11 +1,9 @@
-import "../initializeApp";
-
-import * as admin from "firebase-admin";
 import type {
   DocumentSnapshot,
   FirestoreDataConverter,
 } from "firebase-admin/firestore";
 
+import { admin } from "../../initializeFirebase";
 import { FirestoreVideoType, VideoType } from "../schemas/video";
 import { dateStringToTimestamp } from "./shared";
 
