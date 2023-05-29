@@ -9,8 +9,7 @@ export const videoSchema = z
     replyToVideoId: z.string().optional(),
     muxUploadId: z.string(),
     muxAssetId: z.string().optional(),
-    playbackUrl: z.string().optional(),
-    thumbnailUrl: z.string().optional(),
+    muxPlaybackId: z.string().optional(),
     status: z.enum([
       "UPLOADING",
       "UPLOADING_ERROR",

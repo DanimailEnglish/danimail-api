@@ -57,17 +57,10 @@ export async function handleAssetReadyEvent(event: MuxWebhookEvent) {
 
   const videoId = event.data.passthrough;
   if (videoId != null) {
-    const playbackId = event.data.playback_ids?.[0]?.id;
-    const playbackUrl =
-      playbackId && `https://stream.mux.com/${playbackId}.m3u8`;
-    const thumbnailUrl =
-      playbackId && `https://image.mux.com/${playbackId}/thumbnail.png`;
-
     await FirestoreVideo.update(videoId, {
       status: "READY",
       muxAssetId: event.data.id,
-      playbackUrl,
-      thumbnailUrl,
+      muxPlaybackId: event.data.playback_ids?.[0]?.id,
     });
   }
 }
